@@ -113,35 +113,38 @@ def calc_newton_polynomial(coefs_vector, arr_x, x_dot):
 
     return p
 
-def main(x_dot, n):
+def main(x_dot, n, print_info=True):
     
     #Секция печати
-    print()
-    print("Таблица значений функции")
-    print("X:", end=" ")
-    [print("{:9.6f}".format(i), end=" ") for i in arr_x]
-    print()
-    print("Y:", end=" ")
-    [print("{:9.6f}".format(i), end=" ") for i in arr_y]
-    print()
+    if print_info:
+        print()
+        print("Таблица значений функции")
+        print("X:", end=" ")
+        [print("{:9.6f}".format(i), end=" ") for i in arr_x]
+        print()
+        print("Y:", end=" ")
+        [print("{:9.6f}".format(i), end=" ") for i in arr_y]
+        print()
     #
     
     #Вычисление полинома заданной функции
-    arr_x_sorted, arr_y_sorted = sort_coord_table(arr_x, arr_y)
+    arr_x_sorted, arr_y_sorted = sort_coord_table(arr_x, arr_y, print_info=print_info)
     start_pos = binary_search(arr_x_sorted, x_dot)
-    arr_x_new, arr_y_new = get_nodes(arr_x_sorted, arr_y_sorted, start_pos, n)
-    coefs_vector = calc_dd_coefs(arr_x_new, arr_y_new)
+    arr_x_new, arr_y_new = get_nodes(arr_x_sorted, arr_y_sorted, start_pos, n, print_info=print_info)
+    coefs_vector = calc_dd_coefs(arr_x_new, arr_y_new, print_info=print_info)
     y_dot = calc_newton_polynomial(coefs_vector, arr_x_new, x_dot)
 
-    print("========================")
-    print("Вычисление корня функции")
-    print("========================")
+    #Секция печти
+    if print_info:
+        print("========================")
+        print("Вычисление корня функции")
+        print("========================")
 
     #Вычисление значения корня функции
-    arr_x_sorted, arr_y_sorted = sort_coord_table(arr_y, arr_x)
+    arr_x_sorted, arr_y_sorted = sort_coord_table(arr_y, arr_x, print_info=print_info)
     start_pos = binary_search(arr_x_sorted, 0)
-    arr_x_new, arr_y_new = get_nodes(arr_x_sorted, arr_y_sorted, start_pos, n)
-    coefs_vector = calc_dd_coefs(arr_x_new, arr_y_new)
+    arr_x_new, arr_y_new = get_nodes(arr_x_sorted, arr_y_sorted, start_pos, n, print_info=print_info)
+    coefs_vector = calc_dd_coefs(arr_x_new, arr_y_new, print_info=print_info)
     func_root = calc_newton_polynomial(coefs_vector, arr_x_new, 0)
 
     return y_dot, func_root
@@ -149,25 +152,31 @@ def main(x_dot, n):
 if __name__ == "__main__":
     print()
     while True:
-        x_dot = float(input("Введите точку на оси X в интервале [0, 1.05]:/n>>> "))
+        x_dot = float(input("Введите точку на оси X в интервале [0, 1.05]:/>>> "))
         if x_dot > arr_x[-1] or x_dot < arr_x[0]:
             print("Введенное значение находится за пределами заданного интервала")
-            stop = input("Продолжить [y/n]?/n>>> ")
+            stop = input("Продолжить [y/n]?/>>> ")
             if stop == "n":
                 break
             else:
                 continue
-        n = int(input("Введите степень полинома в интервале [0, 4]:/n>>> "))
+        n = int(input("Введите степень полинома в интервале [0, 4]:/>>> "))
         if n > 4 or n < 0:
             print("Введенное значение находится за пределами заданного интервала")
-            stop = input("Продолжить [y/n]?/n>>> ")
+            stop = input("Продолжить [y/n]?/>>> ")
             if stop == "n":
                 break
             else:
                 continue
+        should_print = input("Печатать подробный результат [y/n]?/>>> ")
+        if should_print == "y":
+            print_info = True
+        else:
+            print_info = False
         print()
-        print("========================================================================")
-        y_dot_poly, func_root = main(x_dot, n)
+        if print_info:
+            print("========================================================================")
+        y_dot_poly, func_root = main(x_dot, n, print_info=print_info)
         print("========================================================================")
         print("Значение полинома {}й степени в точке {} на оси Х:".format(n, x_dot), y_dot_poly)
         print("Значение корня функции, полученное путем обратной интерполяции:", func_root)
