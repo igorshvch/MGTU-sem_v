@@ -18,5 +18,5 @@
 ***Все ссылки на файлы действительны до 01.07.2022!***
 
 [1]: https://1drv.ms/u/s!AnleQw_T68WwjeB_DePM-gjGGbSExw?e=Uaumhc
-[2]: https://1drv.ms/w/s!AnleQw_T68WwjeEA78hYoU6OEW-Z3w?e=0hmJOL
+[2]: https://1drv.ms/w/s!AnleQw_T68WwjeEB-lSAxLrakHnp3Q?e=DfJRab
 [3]: https://1drv.ms/w/s!AnleQw_T68WwjeEtTHV5jHD9XcEdzg?e=kOWMii
