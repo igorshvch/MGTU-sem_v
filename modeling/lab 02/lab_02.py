@@ -62,3 +62,51 @@ def eval_Lm_roots(n):
         roots_res.append(x)
     return roots_res
 
+def eval_At_sum(k):
+    '''
+    Вычисление суммы произведений Ai*ti
+    '''
+    return 2/(k+1) if k%2==0 else 0
+
+def build_At_matrix_with_coef_sum(n, Lm_roots):
+    '''
+    Строим СЛАУ
+    '''
+    M = []
+    for k in range(n):
+        row = []
+        for ti in Lm_roots:
+            row.append(ti**k)
+        row.append(eval_At_sum(k))
+        M.append(row)
+    return M
+
+def eval_Ai_coefs(M):
+    '''
+    Решаем СЛАУ, находим коэффициенты Ai
+    '''
+    n = len(M)
+    X = [0 for i in range(n)]
+    for i in range(n):
+        for j in range(i+1, n):
+            ratio = M[j][i]/M[i][i]
+            for k in range(n+1):
+                M[j][k] = M[j][k] - ratio*M[i][k]
+    X[n-1] = M[n-1][n]/M[n-1][n-1]
+    for i in range(n-2, -1, -1):
+        X[i] = M[i][n]
+        for j in range(i+1, n):
+            X[i] = X[i] - M[i][j]*X[j]
+        X[i] = X[i]/M[i][i]
+    return X
+
+def eval_Gauss_integration(func, a, b, N_nodes, yi):
+    '''
+    Проводим численное интегрирование по формуле Гаусса
+    '''
+    T = eval_Lm_roots(N_nodes)
+    A = eval_Ai_coefs(build_At_matrix_with_coef_sum(N_nodes, T))
+    hy = (b-a)/N_nodes
+    sum_Aiti = sum([Ai*func((a+b)/2+((b-a)/2)*ti, a+yi*hy) for (Ai, ti) in zip(A, T)])
+    res = ((b-a)/2)*sum_Aiti
+    return res
