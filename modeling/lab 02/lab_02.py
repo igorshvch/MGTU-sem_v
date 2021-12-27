@@ -1,4 +1,4 @@
-import math
+from math import *
 
 def machine_epsilon(func=float):
     '''
@@ -48,8 +48,8 @@ def eval_Lm_roots(n):
     ME = machine_epsilon()*10
     roots_res = []
     roots_init_approx = [
-        math.cos(
-            (math.pi*(4*i-1)) / (4*n+2)
+        cos(
+            (pi*(4*i-1)) / (4*n+2)
         )
         for i in range(1, n+1)
     ]
