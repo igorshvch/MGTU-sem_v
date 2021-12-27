@@ -110,3 +110,13 @@ def eval_Gauss_integration(func, a, b, N_nodes, yi):
     sum_Aiti = sum([Ai*func((a+b)/2+((b-a)/2)*ti, a+yi*hy) for (Ai, ti) in zip(A, T)])
     res = ((b-a)/2)*sum_Aiti
     return res
+
+def eval_func(t):
+    '''
+    Интегрируемая функция
+    '''
+    def inner_func_LR(theta, phi):
+        return (2*cos(theta)) / ((1-(sin(theta)**2))*(cos(phi)**2))
+    def inner_func_main(t, LR_func, theta, phi):
+        return (1-exp((-t)*LR_func(theta, phi))) * cos(theta)*sin(theta)
+    return lambda theta, phi: inner_func_main(t, inner_func_LR, theta, phi)
