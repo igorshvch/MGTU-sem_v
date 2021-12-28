@@ -10,6 +10,18 @@ def machine_epsilon(func=float):
         machine_epsilon = func(machine_epsilon) / func(2)
     return machine_epsilon_last
 
+ME = machine_epsilon()*10
+
+def eval_func(t):
+    '''
+    Интегрируемая функция
+    '''
+    def inner_func_LR(theta, phi):
+        return (2*cos(theta)) / (1-(sin(theta)**2)*(cos(phi)**2))
+    def inner_func_main(t, LR_func, theta, phi):
+        return (1-exp((-t)*LR_func(theta, phi))) * cos(theta)*sin(theta)
+    return lambda theta, phi: inner_func_main(t, inner_func_LR, theta, phi)
+
 def eval_Lm(x, n):
     '''
     Вычисление полинома Лежандра n-ой степени
@@ -33,6 +45,7 @@ def eval_Lm(x, n):
     else:
         return 1 if pow == 0 else x
 
+
 def eval_Lm_derivative(x, n):
     '''
     Вычисление производной полинома Лежандра
@@ -45,7 +58,6 @@ def eval_Lm_roots(n):
     '''
     Вычисление заданного количества корней полинома Лежандра
     '''
-    ME = machine_epsilon()*10
     roots_res = []
     roots_init_approx = [
         cos(
@@ -61,6 +73,10 @@ def eval_Lm_roots(n):
             x = x - Lm/Lm_deriv
         roots_res.append(x)
     return roots_res
+
+'========================================================================='
+'========================================================================='
+'========================================================================='
 
 def eval_At_sum(k):
     '''
@@ -100,23 +116,49 @@ def eval_Ai_coefs(M):
         X[i] = X[i]/M[i][i]
     return X
 
-def eval_Gauss_integration(func, a, b, N_nodes, yi):
+def eval_Gauss_integration(func, a, b, N_nodes):
     '''
     Проводим численное интегрирование по формуле Гаусса
     '''
     T = eval_Lm_roots(N_nodes)
     A = eval_Ai_coefs(build_At_matrix_with_coef_sum(N_nodes, T))
-    hy = (b-a)/N_nodes
-    sum_Aiti = sum([Ai*func((a+b)/2+((b-a)/2)*ti, a+yi*hy) for (Ai, ti) in zip(A, T)])
+    sum_Aiti = sum([Ai*func((a+b)/2+((b-a)/2)*ti) for (Ai, ti) in zip(A, T)])
     res = ((b-a)/2)*sum_Aiti
     return res
 
-def eval_func(t):
+def eval_Simpson_multiple_integration(func, a, b, N_nodes):
     '''
-    Интегрируемая функция
+    Вычисляем кратный интеграл по формуле Симпсона
     '''
-    def inner_func_LR(theta, phi):
-        return (2*cos(theta)) / ((1-(sin(theta)**2))*(cos(phi)**2))
-    def inner_func_main(t, LR_func, theta, phi):
-        return (1-exp((-t)*LR_func(theta, phi))) * cos(theta)*sin(theta)
-    return lambda theta, phi: inner_func_main(t, inner_func_LR, theta, phi)
+    res = 0
+    h = (b - a) / N_nodes
+    x = a
+    half_int = h/2
+    while x < b:
+        next_x = x + h
+        res += func(x) + 4 * func(x + half_int) + func(next_x)
+        x = next_x
+    return h / 6 * res
+
+def composite_integrate(func, a, b, c, d, N, M):
+    res_Gauss = lambda x: eval_Gauss_integration(lambda y: func(x, y), c, d, M)
+    return eval_Simpson_multiple_integration(res_Gauss, a, b, N)
+
+def integrate(t, N_Simpson, M_Gauss):
+    ef = eval_func(t)
+    return 4 / pi * composite_integrate(
+        ef,
+        0, pi/2,
+        0, pi/2,
+        N_Simpson, M_Gauss)
+
+if __name__ == '__main__':
+    print(integrate(0.808, 4, 5))
+    print(integrate(2, 10, 11))
+    t = 0.05
+    N = 10
+    M = 10
+    for i in range(20):
+        print("t=", t, integrate(t, N, M))
+        t += 0.5
+    print("t=", 10, integrate(10, N, M))
