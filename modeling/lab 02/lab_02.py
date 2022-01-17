@@ -74,10 +74,6 @@ def eval_Lm_roots(n):
         roots_res.append(x)
     return roots_res
 
-'========================================================================='
-'========================================================================='
-'========================================================================='
-
 def eval_At_sum(k):
     '''
     Вычисление суммы произведений Ai*ti
@@ -119,6 +115,7 @@ def eval_Ai_coefs(M):
 def eval_Gauss_integration(func, a, b, N_nodes):
     '''
     Проводим численное интегрирование по формуле Гаусса
+    по первому направлению
     '''
     T = eval_Lm_roots(N_nodes)
     A = eval_Ai_coefs(build_At_matrix_with_coef_sum(N_nodes, T))
@@ -128,7 +125,8 @@ def eval_Gauss_integration(func, a, b, N_nodes):
 
 def eval_Simpson_multiple_integration(func, a, b, N_nodes):
     '''
-    Вычисляем кратный интеграл по формуле Симпсона
+    Проводим численное интегрирование по формуле Симпсона
+    по второму направлению 
     '''
     res = 0
     h = (b - a) / N_nodes
@@ -141,10 +139,17 @@ def eval_Simpson_multiple_integration(func, a, b, N_nodes):
     return h / 6 * res
 
 def composite_integrate(func, a, b, c, d, N, M):
+    '''
+    Вычисляем кратный интеграл 
+    '''
     res_Gauss = lambda x: eval_Gauss_integration(lambda y: func(x, y), c, d, M)
     return eval_Simpson_multiple_integration(res_Gauss, a, b, N)
 
 def integrate(t, N_Simpson, M_Gauss):
+    '''
+    Вспомогательная функция с заранее установленными пераметрами,
+    соответствующими заданным по условию
+    '''
     ef = eval_func(t)
     return 4 / pi * composite_integrate(
         ef,
@@ -153,12 +158,16 @@ def integrate(t, N_Simpson, M_Gauss):
         N_Simpson, M_Gauss)
 
 if __name__ == '__main__':
-    print(integrate(0.808, 4, 5))
-    print(integrate(2, 10, 11))
     t = 0.05
-    N = 10
-    M = 10
-    for i in range(20):
-        print("t=", t, integrate(t, N, M))
-        t += 0.5
-    print("t=", 10, integrate(10, N, M))
+    N = 8
+    M = 9
+    print(
+        "Расчет кратного интеграла заданной формулы",
+        "при числе узлов: N_Simpson={}, M_Gauss={}".format(N, M)
+        )
+    print("tau = {:5.2f}".format(t), "\tval =", integrate(t, N, M))
+    t = 0.5
+    for i in range(38):
+        print("tau = {:5.2f}".format(t), "\tval =", integrate(t, N, M))
+        t += 0.25
+    print("tau = {:5.2f}".format(10), "\tval =", integrate(10, N, M))
