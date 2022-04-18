@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS Judges (
     LastName        VARCHAR(100)    NOT NULL,
     FirstName       VARCHAR(100)    NOT NULL,
     SecondName      VARCHAR(100),
-    TelNum          VARCHAR(11)     CHECK (char_length(TelNum) = 11),
+    TelNum          VARCHAR(10)     CHECK (char_length(TelNum) = 10),
     Court           INTEGER         NOT NULL,
     CONSTRAINT fk_court
         FOREIGN KEY (Court)
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS CaseNum (
 
 --008. Таблица дел
 CREATE TABLE IF NOT EXISTS Cases (
-    id              SERIAL          PRIMARY KEY,
+    id              INTEGER          PRIMARY KEY,
     Сomplainant     VARCHAR(200)    NOT NULL,
     Defendant       VARCHAR(200)    NOT NULL,
     CaseBasis       VARCHAR(500)    NOT NULL,
@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS Cases (
     Judge           INTEGER         NOT NULL,
     CaseRole        VARCHAR(200)    NOT NULL,
     GrantorId       INTEGER         NOT NULL,
+    DateStart       DATE            NOT NULL,
     Commentary      VARCHAR(1000),
     CONSTRAINT fk_id
         FOREIGN KEY (id)
@@ -123,6 +124,7 @@ CREATE TABLE IF NOT EXISTS SubCase (
     CaseDescript    VARCHAR(500)    NOT NULL,
     SubСomplainant  VARCHAR(200)    NOT NULL,
     SubCaseRole     VARCHAR(200)    NOT NULL,
+    DateStart       DATE            NOT NULL,
     Commentary      VARCHAR(1000),
     CONSTRAINT fk_Case_id
         FOREIGN KEY (Case_id)
@@ -133,7 +135,7 @@ CREATE TABLE IF NOT EXISTS SubCase (
 CREATE TABLE IF NOT EXISTS CaseSession (
     id              SERIAL          PRIMARY KEY,
     Case_id         INTEGER         NOT NULL,
-    SubCase_id      INTEGER         NOT NULL,
+    SubCase_id      INTEGER,
     SessionDate     DATE            NOT NULL,
     SessionTime     TIME,
     SessionRoom     VARCHAR(20),
