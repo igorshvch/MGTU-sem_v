@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS CaseSession (
     SessionRoom     VARCHAR(20),
     ParticipForm    VARCHAR(20),
     ToDo            VARCHAR(200),
+    Done            BOOLEAN,
     DecisionRef     VARCHAR(500),
     Commentary      VARCHAR(1000),
     CONSTRAINT fk_Case_id

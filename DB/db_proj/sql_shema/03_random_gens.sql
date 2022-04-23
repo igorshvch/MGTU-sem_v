@@ -14,7 +14,9 @@ DROP FUNCTION IF EXISTS RandCourtName;
 DROP FUNCTION IF EXISTS RandGetCourt;
 DROP FUNCTION IF EXISTS RandCaseBasis;
 DROP FUNCTION IF EXISTS RandFullName;
-DROP FUNCTION IF EXISTS RandCaseRole;
+DROP FUNCTION IF EXISTS RandParticipForm;
+DROP FUNCTION IF EXISTS RandToDo;
+DROP FUNCTION IF EXISTS RandDone;
 DROP FUNCTION IF EXISTS GetRandJudgeFromCourt;
 
 CREATE OR REPLACE FUNCTION RandTxtArElem(Arr text[])
@@ -196,8 +198,7 @@ CREATE OR REPLACE FUNCTION RandTime ()
             TimeEnd         TIME = '17:50';
             res             TIME;
         BEGIN
-            res = TimeStart +
-                cast(random() * (TimeEnd-TimeStart) as INTEGER);
+            res = to_char(TimeStart +(random() * (TimeEnd-TimeStart)), 'HH24:MI')::TIME;
             RETURN res;
         END;
     $$;
@@ -322,6 +323,45 @@ CREATE OR REPLACE FUNCTION RandCaseRole(mode CHAR DEFAULT 'm')
         END;
     $$;
 
+CREATE OR REPLACE FUNCTION RandParticipForm()
+    RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+        DECLARE
+            TextAr          text[] = '{Заседание, Он-лайн, Только позиция}';
+            res             text;
+        BEGIN
+            res = RandTxtArElem(TextAr);
+            RETURN res;
+        END;
+    $$;
+
+CREATE OR REPLACE FUNCTION RandToDo()
+    RETURNS text
+    LANGUAGE plpgsql
+    AS $$
+        DECLARE
+            TextAr          text[] = '{Написать позицию, Дополнить позицию, Написать отзыв, Написать ходатайство или  заявление}';
+            res             text;
+        BEGIN
+            res = RandTxtArElem(TextAr);
+            RETURN res;
+        END;
+    $$;
+
+CREATE OR REPLACE FUNCTION RandDone()
+    RETURNS BOOLEAN
+    LANGUAGE plpgsql
+    AS $$
+        DECLARE
+            BoolAr          BOOLEAN[] = '{TRUE, FALSE}';
+            res             BOOLEAN;
+        BEGIN
+            res = BoolAr[floor(random() * array_length(BoolAr, 1) + 1)];
+            RETURN res;
+        END;
+    $$;
+/*
 CREATE OR REPLACE FUNCTION GetRandJudgeFromCourt (CourtID INTEGER)
     RETURNS INTEGER
     LANGUAGE plpgsql
@@ -335,7 +375,7 @@ CREATE OR REPLACE FUNCTION GetRandJudgeFromCourt (CourtID INTEGER)
             RETURN res;
         END;
     $$;
-
+*/
 
 /*
 SELECT * FROM

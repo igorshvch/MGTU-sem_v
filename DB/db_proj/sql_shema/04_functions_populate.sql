@@ -1,3 +1,14 @@
+DROP PROCEDURE IF EXISTS  add_PoA_person;
+DROP PROCEDURE IF EXISTS  add_PoA_LegalEntity;
+DROP PROCEDURE IF EXISTS add_Court;
+DROP PROCEDURE IF EXISTS add_Judge;
+DROP PROCEDURE IF EXISTS add_CaseNum;
+DROP FUNCTION IF EXISTS add_CaseNum;
+DROP PROCEDURE IF EXISTS add_Cases;
+DROP PROCEDURE IF EXISTS add_SubCase;
+DROP PROCEDURE IF EXISTS add_CaseSession;
+
+
 CREATE OR REPLACE PROCEDURE add_PoA_person (
         RegNumVal          VARCHAR(12)     DEFAULT NULL
     )
@@ -8,7 +19,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_person (
         BEGIN
         INSERT INTO LegalRepr(TypeOfGrantor) VALUES
             ('p') RETURNING id INTO temp_id;
-            --COMMIT;
         raise notice 'temp_id is %', temp_id;
         INSERT INTO GrantorPerson
             (
@@ -29,7 +39,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_person (
                 RandRegAdress(),
                 RandNum(6)
             );
-        --COMMIT;
         INSERT INTO PowerOfAttorney
             (
                 Grantor,
@@ -45,7 +54,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_person (
                 cast(floor(random()*12) as INTEGER),
                 cast(floor(random()*3) as INTEGER)
             );
-        --COMMIT;
         END;
     $$;
 
@@ -57,7 +65,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_LegalEntity ()
         BEGIN
         INSERT INTO LegalRepr(TypeOfGrantor) VALUES
             ('l') RETURNING id INTO temp_id;
-            --COMMIT;
         raise notice 'temp_id is %', temp_id;
         INSERT INTO GrantorLE
             (
@@ -78,7 +85,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_LegalEntity ()
                 RandRegAdress(),
                 RandNum(6)
             );
-        --COMMIT;
         INSERT INTO PowerOfAttorney
             (
                 Grantor,
@@ -94,7 +100,6 @@ CREATE OR REPLACE PROCEDURE add_PoA_LegalEntity ()
                 cast(floor(random()*12) as INTEGER),
                 cast(floor(random()*3) as INTEGER)
             );
-        --COMMIT;
         END;
     $$;
 
@@ -140,9 +145,12 @@ CREATE OR REPLACE PROCEDURE add_Judge()
         END;
     $$;
 
-CREATE OR REPLACE PROCEDURE add_CaseNum()
+CREATE OR REPLACE FUNCTION add_CaseNum()
+    RETURNS INTEGER
     LANGUAGE plpgsql
     AS $$
+        DECLARE
+            temp_id             INTEGER;
         BEGIN
             INSERT INTO CaseNum
                 (
@@ -152,7 +160,8 @@ CREATE OR REPLACE PROCEDURE add_CaseNum()
                 (
                     RandCaseNum(),
                     RandNum(20)
-                );
+                ) RETURNING id INTO temp_id;
+            RETURN temp_id;
         END;
     $$;
 
@@ -161,12 +170,14 @@ CREATE OR REPLACE PROCEDURE add_Cases()
     AS $$
         DECLARE
             CourtId             INTEGER;
-            JudgeId             INTEGER;           
+            JudgeId             INTEGER;
+            temp_id             INTEGER;        
         BEGIN
-            CourtId = RandGetId('Courts');
+            JudgeId = RandGetId('Judges');
+            SELECT Court INTO CourtId FROM Judges WHERE id = JudgeID;
             RAISE NOTICE 'this is CourtID %', CourtId;
-            JudgeId = GetRandJudgeFromCourt(CourtId);
             RAISE NOTICE 'this is JudgeID %', JudgeId;
+            temp_id = add_CaseNum();
             INSERT INTO Cases
                 (
                     id,
@@ -180,12 +191,12 @@ CREATE OR REPLACE PROCEDURE add_Cases()
                     DateStart
                 ) VALUES
                 (
-                    RandGetId('CaseNum'),
+                    temp_id,
                     RandFullName(),
                     RandFullName(),
                     RandCaseBasis('m'),
                     CourtId,
-                    GetRandJudgeFromCourt(CourtId),
+                    JudgeId,
                     RandCaseRole('m'),
                     RandGetId('LegalRepr'),
                     RandDate(DateStart=>'2019-01-01', DateEnd=>'2020-07-01')
@@ -224,6 +235,7 @@ CREATE OR REPLACE PROCEDURE add_SubCase()
         END;
     $$;
 
+
 CREATE OR REPLACE PROCEDURE add_CaseSession()
     LANGUAGE plpgsql
     AS $$
@@ -233,21 +245,14 @@ CREATE OR REPLACE PROCEDURE add_CaseSession()
             temp_Date          DATE;
             Date_Session       DATE;
         BEGIN
-            CaseId = RandIntArElem(Cases);
-            SELECT id INTO SubCaseID FROM SubCase WHERE id = CaseId;
-            IF SubCaseID NOT NULL THEN
+            CaseId = RandGetId('Cases');
+            SELECT id INTO SubCaseID FROM SubCase WHERE Case_id = CaseId;
+            IF SubCaseID IS NOT NULL THEN
                 SELECT DateStart INTO temp_Date FROM SubCase WHERE id = SubCaseID;
             ELSE
                 SELECT DateStart INTO temp_Date FROM Cases WHERE id = CaseId;
             END IF;
             Date_Session = RandDate(DateStart => temp_Date, DateEnd => '2022-05-01');
-            
-
-
-            
-            
-        /*
-        */
             INSERT INTO CaseSession
                 (
                     Case_id,
@@ -257,16 +262,18 @@ CREATE OR REPLACE PROCEDURE add_CaseSession()
                     SessionRoom,
                     ParticipForm,
                     ToDo,
+                    Done,
                     DecisionRef
                 ) VALUES
                 (
                     CaseId,
                     SubCaseId,
                     Date_Session,
-                    ..,
+                    RandTime(),
                     RandNum(3),
-                    ..,
-                    ..,
+                    RandParticipForm(),
+                    RandToDo(),
+                    RandDone(),
                     RandWeb(12)
                 );
         END;

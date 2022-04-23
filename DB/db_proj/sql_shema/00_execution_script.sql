@@ -1,17 +1,34 @@
-/*
-CALL add_PoA_person ();
+CREATE OR REPLACE PROCEDURE iterations()
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        FOR i IN 1..1800 LOOP
+            /*
+            CALL add_PoA_person ();
 
-CALL add_PoA_person (RegNumVal => RandNum(12));
+            CALL add_PoA_person (RegNumVal => RandNum(12));
 
-CALL add_PoA_LegalEntity ();
+            CALL add_PoA_LegalEntity ();
 
-CALL add_Court();
+            CALL add_Court();
 
-CALL add_Judge();
+            CALL add_Judge();
 
-CALL add_CaseNum();
+            CALL add_Cases();
+            
+            CALL add_SubCase();
+            */
+            
 
-CALL add_Cases();
+            CALL add_CaseSession();
+            /*
+            
+            
+            
 
-CALL add_SubCase();
-*/
+            */
+        END LOOP;
+    END;
+    $$;
+
+CALL iterations();
