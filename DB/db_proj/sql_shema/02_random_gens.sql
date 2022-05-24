@@ -1,25 +1,26 @@
-DROP FUNCTION IF EXISTS RandTxtArElem;
-DROP FUNCTION IF EXISTS RandIntArElem;
-DROP FUNCTION IF EXISTS RandGetId;
-DROP FUNCTION IF EXISTS RandPersName;
-DROP FUNCTION IF EXISTS RandNum;
-DROP FUNCTION IF EXISTS RandWeb;
-DROP FUNCTION IF EXISTS RandRegAdress;
-DROP FUNCTION IF EXISTS RandCompName;
-DROP FUNCTION IF EXISTS RandLegalForm;
-DROP FUNCTION IF EXISTS RandDate;
-DROP FUNCTION IF EXISTS RandTime;
-DROP FUNCTION IF EXISTS RandCaseNum;
-DROP FUNCTION IF EXISTS RandCourtName;
-DROP FUNCTION IF EXISTS RandGetCourt;
-DROP FUNCTION IF EXISTS RandCaseBasis;
-DROP FUNCTION IF EXISTS RandFullName;
-DROP FUNCTION IF EXISTS RandParticipForm;
-DROP FUNCTION IF EXISTS RandToDo;
-DROP FUNCTION IF EXISTS RandDone;
-DROP FUNCTION IF EXISTS GetRandJudgeFromCourt;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandTxtArElem;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandIntArElem;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandGetId;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandPersName;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandNum;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandWeb;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandRegAdress;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandCompName;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandLegalForm;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandDate;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandTime;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandCaseNum;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandCourtName;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandGetCourt;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandCaseBasis;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandFullName;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandParticipForm;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandToDo;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandDone;
+DROP FUNCTION IF EXISTS legal_issue_tracker.RandPayment;
+--DROP FUNCTION IF EXISTS legal_issue_tracker.GetRandJudgeFromCourt;
 
-CREATE OR REPLACE FUNCTION RandTxtArElem(Arr text[])
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandTxtArElem(Arr text[])
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -31,7 +32,7 @@ CREATE OR REPLACE FUNCTION RandTxtArElem(Arr text[])
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandIntArElem(Arr INTEGER[])
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandIntArElem(Arr INTEGER[])
     RETURNS INTEGER
     LANGUAGE plpgsql
     AS $$
@@ -43,7 +44,7 @@ CREATE OR REPLACE FUNCTION RandIntArElem(Arr INTEGER[])
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandGetId(TblName regclass)
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandGetId(TblName regclass)
     RETURNS INTEGER
     LANGUAGE plpgsql
     AS $$
@@ -51,7 +52,6 @@ CREATE OR REPLACE FUNCTION RandGetId(TblName regclass)
             IntAr           INTEGER[];
             res             INTEGER;
         BEGIN
-            RAISE NOTICE 'this is tblName %', TblName;
             EXECUTE format('SELECT array(SELECT id FROM %s)', TblName)
             INTO IntAr;
             res = IntAr[floor(random() * array_length(IntAr, 1) + 1)];
@@ -59,7 +59,7 @@ CREATE OR REPLACE FUNCTION RandGetId(TblName regclass)
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandPersName (mode CHAR DEFAULT 'f')
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandPersName (mode CHAR DEFAULT 'f')
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -83,7 +83,7 @@ CREATE OR REPLACE FUNCTION RandPersName (mode CHAR DEFAULT 'f')
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandNum (NumLen INTEGER DEFAULT 1)
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandNum (NumLen INTEGER DEFAULT 1)
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -100,7 +100,7 @@ CREATE OR REPLACE FUNCTION RandNum (NumLen INTEGER DEFAULT 1)
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandWeb (NumLen INTEGER DEFAULT 1)
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandWeb (NumLen INTEGER DEFAULT 1)
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -118,7 +118,7 @@ CREATE OR REPLACE FUNCTION RandWeb (NumLen INTEGER DEFAULT 1)
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandRegAdress ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandRegAdress ()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -142,7 +142,7 @@ CREATE OR REPLACE FUNCTION RandRegAdress ()
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandCompName ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCompName ()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -152,15 +152,15 @@ CREATE OR REPLACE FUNCTION RandCompName ()
             IntAr           text[] = '{0,1,2,3,4,5,6,7,8,9}';
             res             text;
         BEGIN
-            res = RandTxtArElem(FirstNames) || ' ' || RandTxtArElem(SecondNames) || ' ';
+            res = legal_issue_tracker.RandTxtArElem(FirstNames) || ' ' || legal_issue_tracker.RandTxtArElem(SecondNames) || ' ';
             FOR i IN 1..3 LOOP
-                res = res || RandTxtArElem(IntAr);
+                res = res || legal_issue_tracker.RandTxtArElem(IntAr);
             END LOOP;
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandLegalForm ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandLegalForm ()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -173,7 +173,7 @@ CREATE OR REPLACE FUNCTION RandLegalForm ()
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandDate (
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandDate (
         DateStart DATE DEFAULT '2018-01-01',
         DateEnd DATE DEFAULT '2022-05-01'
     )
@@ -189,7 +189,7 @@ CREATE OR REPLACE FUNCTION RandDate (
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandTime ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandTime ()
     RETURNS TIME
     LANGUAGE plpgsql
     AS $$
@@ -203,7 +203,7 @@ CREATE OR REPLACE FUNCTION RandTime ()
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandCaseNum ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCaseNum ()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -212,13 +212,13 @@ CREATE OR REPLACE FUNCTION RandCaseNum ()
             IntAr           text[] = '{0,1,2,3,4,5,6,7,8,9}';
             res             text;
         BEGIN
-            res = RandTxtArElem(CapAlph);
+            res = legal_issue_tracker.RandTxtArElem(CapAlph);
             FOR i IN 1..2 LOOP
-                res = res || RandTxtArElem(IntAr);
+                res = res || legal_issue_tracker.RandTxtArElem(IntAr);
             END LOOP;
             res = res || '-';
             FOR i IN 1..6 LOOP
-                res = res || RandTxtArElem(IntAr);
+                res = res || legal_issue_tracker.RandTxtArElem(IntAr);
             END LOOP;
             res = res || '/';
             res = res|| (SELECT extract(year FROM date '2018-01-01' +
@@ -233,7 +233,7 @@ CREATE OR REPLACE FUNCTION RandCaseNum ()
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandCourtName ()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCourtName ()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -244,17 +244,17 @@ CREATE OR REPLACE FUNCTION RandCourtName ()
             f_mode          CHAR;
             res             text;
         BEGIN
-            f_mode = RandTxtArElem(FuncMode);
+            f_mode = legal_issue_tracker.RandTxtArElem(FuncMode);
             IF f_mode = 'a' THEN
-                res = RandTxtArElem(CourtNum)||' арбитражный '||RandTxtArElem(CourtLev)||' суд';
+                res = legal_issue_tracker.RandTxtArElem(CourtNum)||' арбитражный '||legal_issue_tracker.RandTxtArElem(CourtLev)||' суд';
             ELSEIF f_mode = 'c' THEN
-                res = RandTxtArElem(CourtNum)||' '||RandTxtArElem(CourtLev)||' суд общей юрисдикции';
+                res = legal_issue_tracker.RandTxtArElem(CourtNum)||' '||legal_issue_tracker.RandTxtArElem(CourtLev)||' суд общей юрисдикции';
             END IF;
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandGetCourt()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandGetCourt()
     RETURNS INTEGER
     LANGUAGE plpgsql
     AS $$
@@ -262,13 +262,13 @@ CREATE OR REPLACE FUNCTION RandGetCourt()
             IntAr           INTEGER[];
             res             INTEGER;
         BEGIN
-            IntAr = array(SELECT id FROM Courts);
+            IntAr = array(SELECT id FROM legal_issue_tracker.Courts);
             res = IntAr[floor(random() * array_length(IntAr, 1) + 1)];
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandCaseBasis(mode CHAR DEFAULT 'm')
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCaseBasis(mode CHAR DEFAULT 'm')
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -278,15 +278,15 @@ CREATE OR REPLACE FUNCTION RandCaseBasis(mode CHAR DEFAULT 'm')
             res               text;
         BEGIN
             IF mode = 'm' THEN
-                res = RandTxtArElem(BasisesArr1);
+                res = legal_issue_tracker.RandTxtArElem(BasisesArr1);
             ELSEIF mode = 's' THEN
-                res = RandTxtArElem(BasisesArr2);
+                res = legal_issue_tracker.RandTxtArElem(BasisesArr2);
             END IF;
             return res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandFullName()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandFullName()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -295,17 +295,17 @@ CREATE OR REPLACE FUNCTION RandFullName()
             f_mode          CHAR;
             res             text;
         BEGIN
-            f_mode = RandTxtArElem(FuncMode);
+            f_mode = legal_issue_tracker.RandTxtArElem(FuncMode);
             IF f_mode = 'l' THEN
-                res = RandLegalForm()||' '||RandCompName();
+                res = legal_issue_tracker.RandLegalForm()||' '||legal_issue_tracker.RandCompName();
             ELSEIF f_mode ='p' THEN
-                res = RandPersName('l')||' '||RandPersName('f')||' '||RandPersName('s');
+                res = legal_issue_tracker.RandPersName('l')||' '||legal_issue_tracker.RandPersName('f')||' '||legal_issue_tracker.RandPersName('s');
             END IF;
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandCaseRole(mode CHAR DEFAULT 'm')
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCaseRole(mode CHAR DEFAULT 'm')
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -315,15 +315,15 @@ CREATE OR REPLACE FUNCTION RandCaseRole(mode CHAR DEFAULT 'm')
             res             text;
         BEGIN
             IF mode = 'm' THEN
-                res = RandTxtArElem(TextAr1);
+                res = legal_issue_tracker.RandTxtArElem(TextAr1);
             ELSEIF mode = 's' THEN
-                res = RandTxtArElem(TextAr2);
+                res = legal_issue_tracker.RandTxtArElem(TextAr2);
             END IF;
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandParticipForm()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandParticipForm()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -331,12 +331,12 @@ CREATE OR REPLACE FUNCTION RandParticipForm()
             TextAr          text[] = '{Заседание, Он-лайн, Только позиция}';
             res             text;
         BEGIN
-            res = RandTxtArElem(TextAr);
+            res = legal_issue_tracker.RandTxtArElem(TextAr);
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandToDo()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandToDo()
     RETURNS text
     LANGUAGE plpgsql
     AS $$
@@ -344,12 +344,12 @@ CREATE OR REPLACE FUNCTION RandToDo()
             TextAr          text[] = '{Написать позицию, Дополнить позицию, Написать отзыв, Написать ходатайство или  заявление}';
             res             text;
         BEGIN
-            res = RandTxtArElem(TextAr);
+            res = legal_issue_tracker.RandTxtArElem(TextAr);
             RETURN res;
         END;
     $$;
 
-CREATE OR REPLACE FUNCTION RandDone()
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandDone()
     RETURNS BOOLEAN
     LANGUAGE plpgsql
     AS $$
@@ -361,8 +361,29 @@ CREATE OR REPLACE FUNCTION RandDone()
             RETURN res;
         END;
     $$;
+
+CREATE OR REPLACE FUNCTION legal_issue_tracker.RandPayment()
+    RETURNS legal_issue_tracker.ITEM
+    LANGUAGE plpgsql
+    AS $$
+        DECLARE
+            TextAr          TEXT[] = '{За заседание, Ежемесячно, За все дело}';
+            MoneyAr         Money[] = '{15000, 20000, 25000}';
+            temp_item       legal_issue_tracker.ITEM;
+        BEGIN
+            temp_item.temp_text = legal_issue_tracker.RandTxtArElem(TextAr);
+            IF temp_item.temp_text = 'За заседание' THEN
+                temp_item.temp_money = MoneyAr[floor(random() * array_length(MoneyAr, 1) + 1)];
+            ELSIF temp_item.temp_text = 'Ежемесячно' THEN
+                temp_item.temp_money = MoneyAr[floor(random() * array_length(MoneyAr, 1) + 1)]*3;
+            ELSIF temp_item.temp_text = 'За все дело' THEN
+                temp_item.temp_money = MoneyAr[floor(random() * array_length(MoneyAr, 1) + 1)]*10;
+            END IF;
+            RETURN temp_item;
+        END;
+    $$;
 /*
-CREATE OR REPLACE FUNCTION GetRandJudgeFromCourt (CourtID INTEGER)
+CREATE OR REPLACE FUNCTION legal_issue_tracker.GetRandJudgeFromCourt (CourtID INTEGER)
     RETURNS INTEGER
     LANGUAGE plpgsql
     AS $$
@@ -370,7 +391,7 @@ CREATE OR REPLACE FUNCTION GetRandJudgeFromCourt (CourtID INTEGER)
             IntAr           INTEGER[];
             res             INTEGER;
         BEGIN
-            IntAr = array(SELECT id FROM judges WHERE court = CourtID);
+            IntAr = array(SELECT id FROM legal_issue_tracker.judges WHERE court = CourtID);
             res = IntAr[floor(random() * array_length(IntAr, 1) + 1)];
             RETURN res;
         END;
@@ -379,25 +400,25 @@ CREATE OR REPLACE FUNCTION GetRandJudgeFromCourt (CourtID INTEGER)
 
 /*
 SELECT * FROM
-    NameRand('f') as FirstName
-    JOIN NameRand('s') as SecondName ON True
-    JOIN NameRand('l') as LastName ON True;
+    legal_issue_tracker.NameRand('f') as FirstName
+    JOIN legal_issue_tracker.NameRand('s') as SecondName ON True
+    JOIN legal_issue_tracker.NameRand('l') as LastName ON True;
 
-SELECT * FROM NumRand(6);
+SELECT * FROM legal_issue_tracker.NumRand(6);
 
-SELECT RandWeb(8);
+SELECT legal_issue_tracker.RandWeb(8);
 
-SELECT RandRegAdress();
+SELECT legal_issue_tracker.RandRegAdress();
 
-SELECT RandCompName();
+SELECT legal_issue_tracker.RandCompName();
 
-SELECT RandLegalForm();
+SELECT legal_issue_tracker.RandLegalForm();
 
 SELECT * FROM
-    RandLegalForm() as lf
-    JOIN RandCompName() as cn ON TRUE;
+    legal_issue_tracker.RandLegalForm() as lf
+    JOIN legal_issue_tracker.RandCompName() as cn ON TRUE;
 
-SELECT RandDate();
+SELECT legal_issue_tracker.RandDate();
 
-SELECT RandCaseNum();
+SELECT legal_issue_tracker.RandCaseNum();
 */

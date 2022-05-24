@@ -4,19 +4,19 @@
             "previewLimit": 50,
             "server": "localhost",
             "port": 5432,
-            "askForPassword": true,
             "driver": "PostgreSQL",
-            "name": "Test",
-            "database": "LegalIssueTracker",
-            "username": "postgres"
+            "name": "CourseProj",
+            "database": "courseproj",
+            "username": "postgres",
+            "password": "12345"
         },
         {
             "previewLimit": 50,
             "server": "localhost",
             "port": 5432,
             "driver": "PostgreSQL",
-            "name": "CourseProj",
-            "database": "courseproj",
+            "name": "Tests",
+            "database": "testbase",
             "username": "postgres",
             "password": "12345"
         }
