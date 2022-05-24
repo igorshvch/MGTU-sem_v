@@ -1,3 +1,4 @@
+--Заполнение БД целиком
 CREATE OR REPLACE PROCEDURE legal_issue_tracker.PopulateDataBase()
     LANGUAGE plpgsql
     AS $$

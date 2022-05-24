@@ -142,6 +142,7 @@ CREATE OR REPLACE FUNCTION legal_issue_tracker.RandRegAdress ()
         END;
     $$;
 
+--Генрация случайного наименования юридического лица
 CREATE OR REPLACE FUNCTION legal_issue_tracker.RandCompName ()
     RETURNS text
     LANGUAGE plpgsql

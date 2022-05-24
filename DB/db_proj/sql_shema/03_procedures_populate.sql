@@ -212,6 +212,7 @@ CREATE OR REPLACE PROCEDURE legal_issue_tracker.add_Cases()
         END;
     $$;
 
+--Заполнение таблицы с обособленными спорами
 CREATE OR REPLACE PROCEDURE legal_issue_tracker.add_SubCase()
     LANGUAGE plpgsql
     AS $$
