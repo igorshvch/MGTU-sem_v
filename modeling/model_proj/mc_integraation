@@ -1,0 +1,141 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import integrate
+
+np.random.seed(15)
+
+f1_1 = lambda x: np.cos(x-2)+3
+f1_2 = lambda x: 3 + 2 * x - 3 * (x**2) + 2 * (x**3)
+f1_3 = lambda x: x * np.exp(-x)
+
+f2_1 = lambda x, y: 4 + 2 * y + 2 * x + x * y + (x**3) * y
+f2_2 = lambda x, y: np.cos(x**4)+3*(y**2)
+f2_3 = lambda x, y: np.sqrt((x**2) + (y**2)) + 3 * np.cos(np.sqrt((x**2) + (y**2))) + 5
+
+options = {
+    '11': f1_1,
+    '12': f1_2,
+    '13': f1_3,
+    '21': f2_1,
+    '22': f2_2,
+    '23': f2_3
+}
+
+def eval_integral_1d(func, a, b, n_dots):
+    '''Вычиясляем интеграл в первом приближении'''
+    sum_intgrl = 0
+    dots = np.random.uniform(a, b, n_dots)
+
+    for dot in dots:
+        sum_intgrl += func(dot)
+
+    return (b-a)*sum_intgrl/n_dots
+
+def eval_integral_2d(func, a, b, c, d, n_dot):
+    '''Вычиясляем кратный интеграл'''
+    func_res = 0
+    for i in range(n_dot):
+        x = np.random.uniform(a,b)
+        y = np.random.uniform(c,d)
+        func_res += func(x, y)
+    
+    return ((b - a) * (d - c) / n_dot) * func_res
+
+def test_1d(func, a, b, n_dots):
+    res_mc = eval_integral_1d(func, a, b, n_dots)
+    res = integrate.quad(func, a, b)[0]
+    return res_mc, res, abs(res-res_mc)
+
+def test_2d(func, a, b, c, d, n_dots):
+    f = lambda x,y : func(y, x)
+    res_mc = eval_integral_2d(func, a, b, c, d, n_dots)
+    res = integrate.dblquad(f, a, b, c, d)[0]
+    return res_mc, res, abs(res-res_mc)
+
+def create_chart_2d(f, a, b, n_dots):
+    x = np.linspace(a-abs(a),b+abs(b), n_dots*2)
+    y = np.array([f(xi) for xi in x])
+    x1 = np.linspace(a,b, n_dots)
+    y1 = np.array([f(xi) for xi in x1])
+    plt.fill_between(x1, y1, step="pre")
+    plt.plot(x, y)
+    plt.show()
+
+def create_chart_3d(f, a, b, c, d, n_dots):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    X = np.linspace(a,b, n_dots)
+    Y = np.linspace(c,d, n_dots)
+    X, Y = np.meshgrid(X, Y)
+    zs = np.array([f(x, y) for x, y in zip(np.ravel(X), np.ravel(Y))])
+    Z = zs.reshape(X.shape)
+
+    ax.plot_surface(X, Y, Z, antialiased=False)
+
+    ax.set_xlim(a, b)
+    ax.set_ylim(c, d)
+    ax.set_zlim(4, 20)
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+
+    plt.show()
+
+if __name__ == "__main__":
+    print("Программа вычисления интегралов с помощью метода Монте-Карло")
+    print("Для завершения нажмите Ctrl+C")
+    while True:
+        print("Однократный или двойной интеграл необходимо вычислить? (введите, соответственно, 1 или 2) ")
+        intgrl_t = int(input('>>> '))
+        
+        if intgrl_t != 1 and intgrl_t != 2:
+            print("Некорректный ввод!")
+            continue
+
+
+        if intgrl_t == 1:
+            print("Выберите одну из функций (введите ее порядковый номер")
+            print("1. f(x) = cos(x-2)+3")
+            print("2. f(x) = 3 + 2x - 3x² + 2x³")
+            print("3. f(x) = x * e^(-x)")
+
+            f_n = '1'+input(">>> ")
+
+            print("Введите границы интервала по оси Х")
+            a = int(input("a >>> "))
+            b = int(input("b >>> "))
+
+            print("Введите количество точек по оси X в интервале")
+            n_dots = int(input(">>> "))
+
+            ms, scipy, err = test_1d(options[f_n], a, b, n_dots)
+            print(ms, scipy, err)
+            
+            if int(input("Отобразить график [Y=1/N=0]?\n>>> ")) == 1:
+                create_chart_2d(options[f_n], a, b, 500)
+            
+        elif intgrl_t == 2:
+            print("Выберите одну из функций (введите ее порядковый номер")
+            print("1. f(x, y) = 4 + 2y + 2x + xy + x³y")
+            print("2. f(x, y) = cos(x⁴) + 3y²")
+            print("3. f(x, y) = sqrt(x² + y²) + 3 * cos(sqrt(x² + y²)) + 5")
+
+            f_n = '2'+input(">>> ")
+
+            print("Введите границы интервала по оси Х")
+            a = int(input("a >>> "))
+            b = int(input("b >>> "))
+
+            print("Введите границы интервала по оси Y")
+            c = int(input("c >>> "))
+            d = int(input("d >>> "))
+
+            print("Введите количество точек в области")
+            n_dots = int(input(">>> "))
+
+            ms, scipy, err = test_2d(options[f_n], a, b, c, d, n_dots)
+            print(ms, scipy, err)
+
+            if int(input("Отобразить график [Y=1/N=0]?\n>>> ")) == 1:
+                create_chart_3d(options[f_n], a, b, c, d, 500)
