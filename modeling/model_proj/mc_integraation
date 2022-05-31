@@ -23,23 +23,23 @@ options = {
 
 def eval_integral_1d(func, a, b, n_dots):
     '''Вычиясляем интеграл в первом приближении'''
-    sum_intgrl = 0
+    func_sum = 0
     dots = np.random.uniform(a, b, n_dots)
 
     for dot in dots:
-        sum_intgrl += func(dot)
+        func_sum += func(dot)
 
-    return (b-a)*sum_intgrl/n_dots
+    return (b-a)/n_dots*func_sum
 
 def eval_integral_2d(func, a, b, c, d, n_dot):
     '''Вычиясляем кратный интеграл'''
-    func_res = 0
+    func_sum = 0
     for i in range(n_dot):
         x = np.random.uniform(a,b)
         y = np.random.uniform(c,d)
-        func_res += func(x, y)
+        func_sum += func(x, y)
     
-    return ((b - a) * (d - c) / n_dot) * func_res
+    return ((b-a)*(d-c))/n_dot * func_sum
 
 def test_1d(func, a, b, n_dots):
     res_mc = eval_integral_1d(func, a, b, n_dots)
@@ -82,6 +82,13 @@ def create_chart_3d(f, a, b, c, d, n_dots):
 
     plt.show()
 
+def pretty_print(v1, v2, v3):
+    print('='*43)
+    print('| {:^11s} | {:^11s} | {:^11s} |'.format('результат', 'референс', 'отклонение'))
+    print('='*43)
+    print('| {:>11.5f} | {:>11.5f} | {:>11.5f} |'.format(v1, v2, v3))
+    print('='*43)
+
 if __name__ == "__main__":
     print("Программа вычисления интегралов с помощью метода Монте-Карло")
     print("Для завершения нажмите Ctrl+C")
@@ -110,7 +117,7 @@ if __name__ == "__main__":
             n_dots = int(input(">>> "))
 
             ms, scipy, err = test_1d(options[f_n], a, b, n_dots)
-            print(ms, scipy, err)
+            pretty_print(ms, scipy, err)
             
             if int(input("Отобразить график [Y=1/N=0]?\n>>> ")) == 1:
                 create_chart_2d(options[f_n], a, b, 500)
@@ -135,7 +142,7 @@ if __name__ == "__main__":
             n_dots = int(input(">>> "))
 
             ms, scipy, err = test_2d(options[f_n], a, b, c, d, n_dots)
-            print(ms, scipy, err)
+            pretty_print(ms, scipy, err)
 
             if int(input("Отобразить график [Y=1/N=0]?\n>>> ")) == 1:
                 create_chart_3d(options[f_n], a, b, c, d, 500)
